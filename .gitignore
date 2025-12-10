@@ -1,0 +1,23 @@
+# Bytecode e cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Ambientes virtuais
+venv/
+.env/
+
+# Logs
+*.log
+
+# Configurações locais
+.vscode/
+.idea/
+
+# Arquivos Temporarios
+Temp/
+downloaded_files/
+backup/
+Output/
+teste.*
+requirements.txt
