@@ -24,7 +24,6 @@ def extrairDadosLattes(nome: str) -> None:
     while(tentativa_atual < MAX_TENTATIVAS):
         try:
             tentativa_atual += 1
-            print(tentativa_atual)
             diretorio_atual = os.curdir
             temp_path = Arquivos.PASTA_TEMP.value
             temp = os.path.join(diretorio_atual, temp_path)

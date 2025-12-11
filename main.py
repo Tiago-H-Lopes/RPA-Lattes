@@ -21,30 +21,31 @@ def main(nome: str):
     extrairDadosLattes(nome)
     lista_arquivos = os.listdir(temp)
     if curriculo in lista_arquivos:
-        dados_curriculo, id_lattes = extrairDadosCurriculo()
-        dados_diretorio = extrairDadosDiretorio(id_lattes)
+        id_lattes = extrairDadosCurriculo()
+        extrairDadosDiretorio(id_lattes)
         
         if producao in lista_arquivos:
-            dados_producao = extrairDadosProducao(id_lattes)
-                
+            extrairDadosProducao(id_lattes)  
+            print('Processado com sucesso')          
     else:
         escreverCSV(csv_erro, nome, texto='Não foi possivel baixar o curriculo')
 
 
 if __name__== "__main__":
-    CriarPastas()
     input_csv = Arquivos.INPUT.value
+    CriarPastas()
     
     with open(input_csv) as csv:
         row = csv.readline()
         # while(row):
 
-        for _ in range(30):
-            try:
+        for _ in range(100):
+            # try:
                 nome = csv.readline().strip()
                 print(f'Processando {nome}')
                 deletarArquivosTemporarios()
                 main(nome)
-            except Exception as e:
-                print(e)
-                continue
+                print()
+            # except Exception as e:
+            #     print(e)
+            #     continue

@@ -9,7 +9,7 @@ def extrairElemento(elements: list[Tag], informacao_procurada: str) -> str:
     for element in elements:
         texto: str = element.text
         if texto == informacao_procurada:
-            return element[contador+1].text
+            return elements[contador+1].text
         contador += 1
 
 def extrairDadosCurriculo():
@@ -126,5 +126,6 @@ def extrairDadosCurriculo():
     escreverCSV(Arquivos.PRODUCOES.value, id_lattes, lista=lista_producoes)
     escreverCSV(Arquivos.ARTIGOS_CURRICULO.value, id_lattes, lista=lista_artigos)
 
+    return id_lattes
 if __name__== "__main__":
     extrairDadosCurriculo()
