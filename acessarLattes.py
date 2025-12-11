@@ -42,7 +42,7 @@ def extrairDadosLattes(nome: str) -> None:
                 sb.maximize_window()
 
                 #Abre a janela do perfil procurado
-                sb.type('input[name="textoBusca"]', nome)
+                sb.type('[name="textoBusca"]', nome)
                 sb.click("#botaoBuscaFiltros")
                 sleep(3)
                 primeiro_nome = nome.split(' ')[0].capitalize()

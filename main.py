@@ -6,6 +6,7 @@ from utils import escreverCSV
 from deletarArquivos import deletarArquivosTemporarios
 import os
 from nomes_arquivos_enum import Arquivos
+from criarPastas import CriarPastas
 
 
 def main(nome: str):
@@ -31,6 +32,7 @@ def main(nome: str):
 
 
 if __name__== "__main__":
+    CriarPastas()
     input_csv = Arquivos.INPUT.value
     with open(input_csv) as csv:
         row = csv.readline()
