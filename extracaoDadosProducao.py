@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup, Tag
 from utils import gerarListaProducao, gerarListaProducaoArtigos, escreverCSV
 from nomes_arquivos_enum import Arquivos
 
-def extrairDadosProducao(id_lattes: str) -> dict[str, list[str]]:
+def extrairDadosProducao(id_lattes: str) -> None:
     producao = Arquivos.PRODUCAO.value
     with open(producao, encoding='utf-8') as document:
         html = document.read()
@@ -21,11 +21,3 @@ def extrairDadosProducao(id_lattes: str) -> dict[str, list[str]]:
     escreverCSV(Arquivos.ORIENTACOES.value, id_lattes, lista_orientacoes)
     escreverCSV(Arquivos.TODAS_PRODUCOES.value, id_lattes, lista_todas_prod)
     escreverCSV(Arquivos.ARTIGOS_PRODUCAO.value, id_lattes, lista_artigos)
-
-    return {
-    'lista_prod_bibliograficas': lista_prod_bibliograficas,
-    'lista_prod_tecnica': lista_prod_tecnica,
-    'lista_orientacoes': lista_orientacoes,
-    'lista_todas_prod': lista_todas_prod,
-    'lista_artigos': lista_artigos
-    }

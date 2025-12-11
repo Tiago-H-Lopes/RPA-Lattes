@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup, Tag
 from utils import gerarListaDiretorio, escreverCSV
 from nomes_arquivos_enum import Arquivos
 
-def extrairDadosDiretorio(lattes_id: str) -> dict[str, list[str]]:
+def extrairDadosDiretorio(lattes_id: str) -> None:
     response = requests.get(f'http://dgp.cnpq.br/dgp/espelhorh/{lattes_id}')
     if(response.status_code==200):
         html = response.text
@@ -32,9 +32,3 @@ def extrairDadosDiretorio(lattes_id: str) -> dict[str, list[str]]:
         escreverCSV(Arquivos.GRUPOS_PESQUISA.value, lattes_id, lista_grupos_pesquisa)
         escreverCSV(Arquivos.GRUPOS_ATUACAO.value, lattes_id, lista_grupos_atuacao)
         escreverCSV(Arquivos.LINHA_ATUACAO.value, lattes_id, lista_linhas_atuacao)
-
-        return {
-            'lista_grupos_pesquisa': lista_grupos_pesquisa, 
-            'lista_grupos_atuacao': lista_grupos_atuacao, 
-            'lista_linhas_atuacao': lista_linhas_atuacao
-        }

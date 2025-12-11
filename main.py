@@ -38,7 +38,11 @@ if __name__== "__main__":
         row = csv.readline()
         # while(row):
         for _ in range(30):
-            nome = csv.readline().strip()
-            print(f'Processando {nome}')
-            deletarArquivosTemporarios()
-            main(nome)
+            try:
+                nome = csv.readline().strip()
+                print(f'Processando {nome}')
+                deletarArquivosTemporarios()
+                main(nome)
+            except Exception as e:
+                print(e)
+                continue
