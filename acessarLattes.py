@@ -56,7 +56,6 @@ def extrairDadosLattes(nome: str) -> None:
 
                 sb.click(f'//a[starts-with(text(), "{primeiro_nome}")]', by="xpath", timeout=30)
                 sb.wait_for_element_visible("#idbtnabrircurriculo", timeout=10)
-                sleep(300)
 
                 #Pega os graficos de prd
                 grafico_element_existe = sb.is_element_present('iframe.iframe-modal')

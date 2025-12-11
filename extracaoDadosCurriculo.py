@@ -4,6 +4,14 @@ from utils import gerarListaAtuacao, gerarListaPadrao, pegarElementosCabecalho, 
 from nomes_arquivos_enum import Arquivos
 
 
+def extrairElemento(elements: list[Tag], informacao_procurada: str) -> str:
+    contador = 0
+    for element in elements:
+        texto: str = element.text
+        if texto == informacao_procurada:
+            return element[contador+1].text
+        contador += 1
+
 def extrairDadosCurriculo():
     curriculo = Arquivos.CURRICULO.value
     try:
@@ -46,12 +54,9 @@ def extrairDadosCurriculo():
             
 
     #Pega as informações de citações e endereço
-    try:
-        nome_citacoes = citacoes_elements[3].text
-        nacionalidade = citacoes_elements[7].text
-        endereco_profissional = endereco_elements[1].text
-    except UnboundLocalError as e:
-        raise Exception('Erro ao extrair dados do curriculo')
+    nome_citacoes = extrairElemento(citacoes_elements, 'Nome em citações bibliográficas')
+    nacionalidade = extrairElemento(citacoes_elements, 'País de Nacionalidade')
+    endereco_profissional = extrairElemento(endereco_elements, 'Endereço Profissional')
 
     #Gera lista com as principais formações academicas
     if formacao_academica_elements:

@@ -34,9 +34,11 @@ def main(nome: str):
 if __name__== "__main__":
     CriarPastas()
     input_csv = Arquivos.INPUT.value
+    
     with open(input_csv) as csv:
         row = csv.readline()
         # while(row):
+
         for _ in range(30):
             try:
                 nome = csv.readline().strip()
