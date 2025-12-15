@@ -9,6 +9,7 @@ from utils import escreverCSV
 from nomes_arquivos_enum import Arquivos
 import os
 import unicodedata
+from logs import logger
 
 def remover_acentos(texto):
     # Normaliza o texto para a forma NFD (decomposição)
@@ -58,6 +59,7 @@ def extrairDadosLattes(nome: str) -> None:
                 if titulo.startswith('Nenhum resultado foi encontrado para'):
                     texto = f'Nenhum resultado foi encontrado'
                     escreverCSV(Arquivos.ERRO.value, nome, texto=texto)
+                    logger.warning(f'{texto} para {nome}')
                     break
 
                 nomes_encontrados_elements = sb.find_elements(f'//a', by="xpath")
@@ -71,6 +73,7 @@ def extrairDadosLattes(nome: str) -> None:
                 if len(lista_nomes_encontrados) > 1:
                     texto = f'Muitos resultados encontrados para o nome pesquisado'
                     escreverCSV(Arquivos.ERRO.value, nome, texto=texto)
+                    logger.warning(f'{texto}: {nome}')
                     break
 
                 nome_procurado = lista_nomes_encontrados[0]
@@ -90,7 +93,7 @@ def extrairDadosLattes(nome: str) -> None:
                 loop = False
 
         except Exception as e:
-            print(e)
+            logger.error(e)
 
 def extrairGraficosProducao(sb: BaseCase):
     try:
@@ -104,12 +107,13 @@ def extrairGraficosProducao(sb: BaseCase):
             with open(Arquivos.PRODUCAO.value, "w", encoding="utf-8") as f:
                 f.write(html)
         else:
+            logger.warning('Falha ao abrir o gráfico')
             raise Exception('Falha ao abrir gráfico')
 
     except NoSuchElementException as exception:
-        print(f'Elemento não encontrado: {exception}' )
+        logger.error(f'Elemento não encontrado: {exception}' )
     except Exception as e:
-        print(e)
+        logger.error(e)
 
 
 def extrairCurriculo(sb: BaseCase):
@@ -128,6 +132,7 @@ def extrairCurriculo(sb: BaseCase):
             f.write(html)
             f.close()
     else:
+        logger.warning('Erro ao abrir a página do curriculo')
         raise Exception('Erro ao abrir a página do curriculo')
 
 

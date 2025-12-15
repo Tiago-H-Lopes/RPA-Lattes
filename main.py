@@ -27,15 +27,17 @@ def main(nome: str):
         
         if producao in lista_arquivos:
             extrairDadosProducao(id_lattes)  
-            print('Processado com sucesso')      
+            logger.info('Processado com sucesso')      
             AnotarNomeProcessado(nome)    
     else:
         escreverCSV(csv_erro, nome, texto='Não foi possivel baixar o curriculo')
+        logger.warning(f'Não foi possivel baixar o curriculo de {nome}')
         AnotarNomeProcessado(nome)
 
 
 if __name__== "__main__":
-    logs.logger.info('Execução iniciada')
+    logger = logs.logger
+    logger.info('Execução iniciada')
     input_csv = Arquivos.INPUT.value
     
     with open(input_csv) as csv:
@@ -46,10 +48,10 @@ if __name__== "__main__":
             # try:
                 nome = csv.readline().strip()
                 if not NomeProcessado(nome):
-                    print(f'Processando {nome}')
+                    logger.info(f'Processando {nome}')
                     deletarArquivosTemporarios()
                     main(nome)
-                    print()
+                    
             # except Exception as e:
             #     print(e)
             #     continue
