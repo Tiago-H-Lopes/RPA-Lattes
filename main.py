@@ -53,5 +53,5 @@ if __name__== "__main__":
                     main(nome)
                     
             # except Exception as e:
-            #     print(e)
+            #     logger.error(e)
             #     continue
