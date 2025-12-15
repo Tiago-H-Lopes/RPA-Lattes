@@ -1,13 +1,11 @@
 import os
-import nomes_arquivos as Arquivos
+from nomes_arquivos import PASTA_TEMP, CURRICULO, PRODUCAO
 
 def deletarArquivosTemporarios() -> None:
-    temp = Arquivos.PASTA_TEMP
+    temp = PASTA_TEMP
     arquivos = os.listdir(temp)
-    curriculo = Arquivos.CURRICULO
-    producao = Arquivos.PRODUCAO
-    curriculo = curriculo.name
-    producao = producao.name
+    curriculo = CURRICULO.name
+    producao = PRODUCAO.name
     remover = [curriculo, producao]
     for arquivo in arquivos:
         if arquivo in remover:

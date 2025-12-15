@@ -1,11 +1,7 @@
 import os
-import nomes_arquivos as Arquivos
+from nomes_arquivos import PASTA_TEMP, PASTA_INPUT, PASTA_OUTPUT
 
-temp = Arquivos.PASTA_TEMP
-input = Arquivos.PASTA_INPUT
-output = Arquivos.PASTA_OUTPUT
-
-lista_pastas = [temp, input, output]
+lista_pastas = [PASTA_TEMP, PASTA_INPUT, PASTA_OUTPUT]
 
 for pasta in lista_pastas:
     os.makedirs(pasta, exist_ok=True)
