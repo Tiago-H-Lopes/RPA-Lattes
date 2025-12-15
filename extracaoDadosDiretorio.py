@@ -2,9 +2,11 @@ import requests
 from bs4 import BeautifulSoup, Tag
 from utils import gerarListaDiretorio, escreverCSV
 from nomes_arquivos_enum import Arquivos
+from logs import logger
 
 def extrairDadosDiretorio(lattes_id: str) -> None:
-    response = requests.get(f'http://dgp.cnpq.br/dgp/espelhorh/{lattes_id}')
+    url = f'http://dgp.cnpq.br/dgp/espelhorh/{lattes_id}'
+    response = requests.get(url)
     if(response.status_code==200):
         html = response.text
         soup = BeautifulSoup(html, 'html.parser')
@@ -36,6 +38,9 @@ def extrairDadosDiretorio(lattes_id: str) -> None:
             rows = linhas.find_all('td', role='gridcell')
             lista_linhas_atuacao = gerarListaDiretorio(rows, 2)
             escreverCSV(Arquivos.LINHA_ATUACAO.value, lattes_id, lista_linhas_atuacao)
+    else:
+        logger.error(f'Não foi possivel acessar a url {url}, status code: {response.status_code}')
+
 
 
 if __name__ == '__main__':

@@ -11,6 +11,5 @@ def deletarArquivosTemporarios() -> None:
     remover = [curriculo, producao]
     for arquivo in arquivos:
         if arquivo in remover:
-            print(f'Removendo arquivo: {arquivo}')
             arquivo = os.path.join(os.curdir, temp, arquivo)
             os.remove(arquivo)

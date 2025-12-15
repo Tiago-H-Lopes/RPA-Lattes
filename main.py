@@ -9,6 +9,7 @@ from nomes_arquivos_enum import Arquivos
 from criarPastas import CriarPastas
 from processados import NomeProcessado, AnotarNomeProcessado
 import logs
+from logs import logger
 
 def main(nome: str):
     #Variaveis contendo o caminho da pasta temp e os nomes dos arquivos com as extensões
@@ -36,7 +37,6 @@ def main(nome: str):
 
 
 if __name__== "__main__":
-    logger = logs.logger
     logger.info('Execução iniciada')
     input_csv = Arquivos.INPUT.value
     
