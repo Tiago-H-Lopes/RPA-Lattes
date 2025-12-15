@@ -26,14 +26,14 @@ def extrairDadosDiretorio(lattes_id: str) -> None:
             escreverCSV(Arquivos.GRUPOS_PESQUISA.value, lattes_id, lista_grupos_pesquisa)
         
         grupos_pesquisa_elements = soup.find('div', id='gruposPesquisa')
-        rows = grupos_pesquisa_elements.find_all('td', role='gridcell')
-        if rows:
+        if grupos_pesquisa_elements:
+            rows = grupos_pesquisa_elements.find_all('td', role='gridcell')
             lista_grupos_atuacao = gerarListaDiretorio(rows, 3)
             escreverCSV(Arquivos.GRUPOS_ATUACAO.value, lattes_id, lista_grupos_atuacao)
                 
         linhas = soup.find('div', id='linhasPesquisa')
-        rows = linhas.find_all('td', role='gridcell')
-        if rows:
+        if linhas:
+            rows = linhas.find_all('td', role='gridcell')
             lista_linhas_atuacao = gerarListaDiretorio(rows, 2)
             escreverCSV(Arquivos.LINHA_ATUACAO.value, lattes_id, lista_linhas_atuacao)
 

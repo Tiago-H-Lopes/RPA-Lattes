@@ -61,6 +61,7 @@ def gerarListaAtuacao(elements: list[Tag]) -> list [str]:
         if(texto_elemento.startswith('Outras informa')): continue
 
         if(texto_elemento.endswith('institucional')): 
+            texto = texto.replace('\n', ' ').replace('\t', '')
             lista.append(texto[:-3])
             texto = ''
             continue
@@ -134,22 +135,23 @@ def geraListaValoresGrafico(id: str, soup: BeautifulSoup) -> list[int]:
 
 def gerarListaProducaoArtigos(elements: Tag, titulo_procurado: str, soup: BeautifulSoup) -> list[str]:
     elements_lista = pegarElementosProducao(elements, titulo_procurado)
-    titulos_elements = elements_lista.select('td')
-    id = elements_lista.find('div', class_='chart').get('id')
-    lista_valores: list[int] = geraListaValoresGrafico(id, soup)
     lista: list[str] = []
-    contador=0
-    remover = r'\n\t\xa'
-    for element in titulos_elements:
-        try:
-            titulo = element.text.strip()
-            titulo = titulo.translate(str.maketrans('','', remover))
-            titulo = ' '.join(titulo.split())
-            lista.append(f'{titulo}: {lista_valores[contador]}')
-        except Exception as e:
-            pass
-        finally:
-            contador+=1
+    if elements_lista:
+        titulos_elements = elements_lista.select('td')
+        id = elements_lista.find('div', class_='chart').get('id')
+        lista_valores: list[int] = geraListaValoresGrafico(id, soup)
+        contador=0
+        remover = r'\n\t\xa'
+        for element in titulos_elements:
+            try:
+                titulo = element.text.strip()
+                titulo = titulo.translate(str.maketrans('','', remover))
+                titulo = ' '.join(titulo.split())
+                lista.append(f'{titulo}: {lista_valores[contador]}')
+            except Exception as e:
+                pass
+            finally:
+                contador+=1
 
     return lista
 
@@ -163,11 +165,11 @@ def escreverCSV(arquivo: str, id_lattes: str, lista: list[str] = None, texto: st
         if texto_csv=='':
             nome_arquivo = arquivo.split('/')[-1]
             titulo = nome_arquivo.replace('LATTES_OUTPUT_', '').replace('.csv', '')
-            csv.write(f'LATTES_ID, {titulo}\n')
+            csv.write(f'LATTES_ID; {titulo}\n')
         
         csv.seek(0, 2)
         if lista:
             for item in lista:
-                csv.write(f'{id_lattes}; {item}\n')
+                csv.write(f'{id_lattes}; "{item}"\n')
         if texto:
-                csv.write(f'{id_lattes}; {texto}\n')
+                csv.write(f'{id_lattes}; "{texto}"\n')

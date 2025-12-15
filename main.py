@@ -7,7 +7,8 @@ from deletarArquivos import deletarArquivosTemporarios
 import os
 from nomes_arquivos_enum import Arquivos
 from criarPastas import CriarPastas
-
+from processados import NomeProcessado, AnotarNomeProcessado
+import logs
 
 def main(nome: str):
     #Variaveis contendo o caminho da pasta temp e os nomes dos arquivos com as extensões
@@ -26,14 +27,16 @@ def main(nome: str):
         
         if producao in lista_arquivos:
             extrairDadosProducao(id_lattes)  
-            print('Processado com sucesso')          
+            print('Processado com sucesso')      
+            AnotarNomeProcessado(nome)    
     else:
         escreverCSV(csv_erro, nome, texto='Não foi possivel baixar o curriculo')
+        AnotarNomeProcessado(nome)
 
 
 if __name__== "__main__":
+    logs.logger.info('Execução iniciada')
     input_csv = Arquivos.INPUT.value
-    CriarPastas()
     
     with open(input_csv) as csv:
         row = csv.readline()
@@ -42,10 +45,11 @@ if __name__== "__main__":
         for _ in range(100):
             # try:
                 nome = csv.readline().strip()
-                print(f'Processando {nome}')
-                deletarArquivosTemporarios()
-                main(nome)
-                print()
+                if not NomeProcessado(nome):
+                    print(f'Processando {nome}')
+                    deletarArquivosTemporarios()
+                    main(nome)
+                    print()
             # except Exception as e:
             #     print(e)
             #     continue

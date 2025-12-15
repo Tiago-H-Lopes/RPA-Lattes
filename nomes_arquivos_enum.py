@@ -9,6 +9,7 @@ class Arquivos(Enum):
     ERRO = PASTA_OUTPUT + 'LATTES_OUTPUT_ERROS.csv'
     PRODUCAO = PASTA_TEMP + 'producao.html'
     CURRICULO = PASTA_TEMP + 'curriculo.html'
+    LISTA_NOMES_PROCESSADOS = PASTA_TEMP + 'NOMES_PROCESSADOS.txt'
 
     #CURRICULO
     URL_CV = PASTA_OUTPUT + 'LATTES_OUTPUT_URL_CV.csv'

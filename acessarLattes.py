@@ -8,6 +8,13 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from utils import escreverCSV
 from nomes_arquivos_enum import Arquivos
 import os
+import unicodedata
+
+def remover_acentos(texto):
+    # Normaliza o texto para a forma NFD (decomposição)
+    nfkd = unicodedata.normalize('NFD', texto)
+    # Filtra apenas os caracteres que não são marcas de acento (Mn = Mark, Nonspacing)
+    return ''.join([c for c in nfkd if not unicodedata.category(c) == 'Mn'])
 
 def extrairDadosLattes(nome: str) -> None:
     """
@@ -53,7 +60,21 @@ def extrairDadosLattes(nome: str) -> None:
                     escreverCSV(Arquivos.ERRO.value, nome, texto=texto)
                     break
 
-                sb.click(f'//a[starts-with(text(), "{primeiro_nome}")]', by="xpath", timeout=30)
+                nomes_encontrados_elements = sb.find_elements(f'//a', by="xpath")
+                lista_nomes_encontrados = []
+                for element in nomes_encontrados_elements:
+                    nome_original: str = element.text
+                    nome_substituido = remover_acentos(nome_original)
+                    if(nome_substituido.lower()==nome.lower()):
+                        lista_nomes_encontrados.append(nome_original)
+
+                if len(lista_nomes_encontrados) > 1:
+                    texto = f'Muitos resultados encontrados para o nome pesquisado'
+                    escreverCSV(Arquivos.ERRO.value, nome, texto=texto)
+                    break
+
+                nome_procurado = lista_nomes_encontrados[0]
+                sb.click(f'//a[text()="{nome_procurado}"]', by="xpath", timeout=30)
                 sb.wait_for_element_visible("#idbtnabrircurriculo", timeout=10)
 
                 #Pega os graficos de prd
@@ -111,5 +132,5 @@ def extrairCurriculo(sb: BaseCase):
 
 
 if __name__ == "__main__":
-    nome = 'FABIANA GARCIA FAUSTINO'
+    nome = 'Carlos assuncao'
     extrairDadosLattes(nome)
