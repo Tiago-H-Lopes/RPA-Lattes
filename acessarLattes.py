@@ -6,7 +6,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.remote.webdriver import WebDriver
 from utils import escreverCSV
-from nomes_arquivos_enum import Arquivos
+import nomes_arquivos as Arquivos
 import os
 import unicodedata
 from logs import logger
@@ -33,11 +33,11 @@ def extrairDadosLattes(nome: str) -> None:
         try:
             tentativa_atual += 1
             diretorio_atual = os.curdir
-            temp_path = Arquivos.PASTA_TEMP.value
+            temp_path = Arquivos.PASTA_TEMP
             temp = os.path.join(diretorio_atual, temp_path)
             lista_diretorio = os.listdir(temp)
-            curriculo = Arquivos.CURRICULO.value
-            producao = Arquivos.PRODUCAO.value
+            curriculo = Arquivos.CURRICULO
+            producao = Arquivos.PRODUCAO
             curriculo = curriculo.split('/')[-1]
             producao = producao.split('/')[-1]
 
@@ -58,7 +58,7 @@ def extrairDadosLattes(nome: str) -> None:
                 #Se não encontrar nenhum resultado para o nome pesquisado
                 if titulo.startswith('Nenhum resultado foi encontrado para'):
                     texto = f'Nenhum resultado foi encontrado'
-                    escreverCSV(Arquivos.ERRO.value, nome, texto=texto)
+                    escreverCSV(Arquivos.ERRO, nome, texto=texto)
                     logger.warning(f'{texto} para {nome}')
                     break
 
@@ -72,7 +72,7 @@ def extrairDadosLattes(nome: str) -> None:
 
                 if len(lista_nomes_encontrados) > 1:
                     texto = f'Muitos resultados encontrados para o nome pesquisado'
-                    escreverCSV(Arquivos.ERRO.value, nome, texto=texto)
+                    escreverCSV(Arquivos.ERRO, nome, texto=texto)
                     logger.warning(f'{texto}: {nome}')
                     break
 
@@ -104,7 +104,7 @@ def extrairGraficosProducao(sb: BaseCase):
         grafico_abriu = sb.find_element('//h2[@tabindex=0]')
         if grafico_abriu:
             html = sb.get_page_source()
-            with open(Arquivos.PRODUCAO.value, "w", encoding="utf-8") as f:
+            with open(Arquivos.PRODUCAO, "w", encoding="utf-8") as f:
                 f.write(html)
         else:
             logger.warning('Falha ao abrir o gráfico')
@@ -128,7 +128,7 @@ def extrairCurriculo(sb: BaseCase):
             sb.scroll_to_bottom()
         
         html = sb.get_page_source()       
-        with open(Arquivos.CURRICULO.value, "w", encoding="utf-8") as f:
+        with open(Arquivos.CURRICULO, "w", encoding="utf-8") as f:
             f.write(html)
             f.close()
     else:

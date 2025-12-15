@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup, Tag
 from utils import gerarListaDiretorio, escreverCSV
-from nomes_arquivos_enum import Arquivos
+import nomes_arquivos as Arquivos
 from logs import logger
 
 def extrairDadosDiretorio(lattes_id: str) -> None:
@@ -25,19 +25,19 @@ def extrairDadosDiretorio(lattes_id: str) -> None:
                 pass
 
         if lista_grupos_pesquisa:
-            escreverCSV(Arquivos.GRUPOS_PESQUISA.value, lattes_id, lista_grupos_pesquisa)
+            escreverCSV(Arquivos.GRUPOS_PESQUISA, lattes_id, lista_grupos_pesquisa)
         
         grupos_pesquisa_elements = soup.find('div', id='gruposPesquisa')
         if grupos_pesquisa_elements:
             rows = grupos_pesquisa_elements.find_all('td', role='gridcell')
             lista_grupos_atuacao = gerarListaDiretorio(rows, 3)
-            escreverCSV(Arquivos.GRUPOS_ATUACAO.value, lattes_id, lista_grupos_atuacao)
+            escreverCSV(Arquivos.GRUPOS_ATUACAO, lattes_id, lista_grupos_atuacao)
                 
         linhas = soup.find('div', id='linhasPesquisa')
         if linhas:
             rows = linhas.find_all('td', role='gridcell')
             lista_linhas_atuacao = gerarListaDiretorio(rows, 2)
-            escreverCSV(Arquivos.LINHA_ATUACAO.value, lattes_id, lista_linhas_atuacao)
+            escreverCSV(Arquivos.LINHA_ATUACAO, lattes_id, lista_linhas_atuacao)
     else:
         logger.error(f'Não foi possivel acessar a url {url}, status code: {response.status_code}')
 

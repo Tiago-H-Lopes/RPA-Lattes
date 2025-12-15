@@ -1,9 +1,9 @@
 import os
-from nomes_arquivos_enum import Arquivos
+import nomes_arquivos as Arquivos
 
-temp = Arquivos.PASTA_TEMP.value
-input = Arquivos.PASTA_INPUT.value
-output = Arquivos.PASTA_OUTPUT.value
+temp = Arquivos.PASTA_TEMP
+input = Arquivos.PASTA_INPUT
+output = Arquivos.PASTA_OUTPUT
 
 lista_pastas = [temp, input, output]
 

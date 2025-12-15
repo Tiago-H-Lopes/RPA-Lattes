@@ -1,9 +1,9 @@
 from bs4 import BeautifulSoup, Tag
 from utils import gerarListaProducao, gerarListaProducaoArtigos, escreverCSV
-from nomes_arquivos_enum import Arquivos
+import nomes_arquivos as Arquivos
 
 def extrairDadosProducao(id_lattes: str) -> None:
-    producao = Arquivos.PRODUCAO.value
+    producao = Arquivos.PRODUCAO
     with open(producao, encoding='utf-8') as document:
         html = document.read()
 
@@ -18,16 +18,16 @@ def extrairDadosProducao(id_lattes: str) -> None:
         lista_artigos = gerarListaProducaoArtigos(elements, 'Total de Artigos Publicados por Periódico', soup)
 
     if lista_prod_bibliograficas:
-        escreverCSV(Arquivos.PRODUCOES_BIBLIOGRAFICAS.value, id_lattes, lista_prod_bibliograficas)
+        escreverCSV(Arquivos.PRODUCOES_BIBLIOGRAFICAS, id_lattes, lista_prod_bibliograficas)
 
     if lista_prod_tecnica:
-        escreverCSV(Arquivos.PRODUCOES_TECNICAS.value, id_lattes, lista_prod_tecnica)
+        escreverCSV(Arquivos.PRODUCOES_TECNICAS, id_lattes, lista_prod_tecnica)
 
     if lista_orientacoes:
-        escreverCSV(Arquivos.ORIENTACOES.value, id_lattes, lista_orientacoes)
+        escreverCSV(Arquivos.ORIENTACOES, id_lattes, lista_orientacoes)
 
     if lista_todas_prod:
-        escreverCSV(Arquivos.TODAS_PRODUCOES.value, id_lattes, lista_todas_prod)
+        escreverCSV(Arquivos.TODAS_PRODUCOES, id_lattes, lista_todas_prod)
         
     if lista_artigos:
-        escreverCSV(Arquivos.ARTIGOS_PRODUCAO.value, id_lattes, lista_artigos)
+        escreverCSV(Arquivos.ARTIGOS_PRODUCAO, id_lattes, lista_artigos)

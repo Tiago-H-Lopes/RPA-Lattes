@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 from utils import gerarListaAtuacao, gerarListaPadrao, pegarElementosCabecalho, escreverCSV
-from nomes_arquivos_enum import Arquivos
+import nomes_arquivos as Arquivos
 
 
 def extrairElemento(elements: list[Tag], informacao_procurada: str) -> str:
@@ -13,7 +13,7 @@ def extrairElemento(elements: list[Tag], informacao_procurada: str) -> str:
         contador += 1
 
 def extrairDadosCurriculo():
-    curriculo = Arquivos.CURRICULO.value
+    curriculo = Arquivos.CURRICULO
     try:
         with open(curriculo, "r", encoding="utf-8") as f:
             html = f.read()
@@ -31,9 +31,9 @@ def extrairDadosCurriculo():
     ultima_atualizacao = li_list[2].get_text(strip=True).split(' ')[-1]
     resumo = soup.find('p', class_='resumo').get_text()
     resumo = resumo.replace('\n', '').strip()
-    escreverCSV(Arquivos.URL_CV.value, id_lattes, texto=url_cv)
-    escreverCSV(Arquivos.ULTIMA_ATUALIZACAO.value, id_lattes, texto=ultima_atualizacao)
-    escreverCSV(Arquivos.RESUMO.value, id_lattes, texto=resumo)
+    escreverCSV(Arquivos.URL_CV, id_lattes, texto=url_cv)
+    escreverCSV(Arquivos.ULTIMA_ATUALIZACAO, id_lattes, texto=ultima_atualizacao)
+    escreverCSV(Arquivos.RESUMO, id_lattes, texto=resumo)
 
 
 
@@ -62,25 +62,25 @@ def extrairDadosCurriculo():
     nome_citacoes = extrairElemento(citacoes_elements, 'Nome em citações bibliográficas')
     nacionalidade = extrairElemento(citacoes_elements, 'País de Nacionalidade')
     endereco_profissional = extrairElemento(endereco_elements, 'Endereço Profissional')
-    escreverCSV(Arquivos.NOME_CITACOES.value, id_lattes, texto=nome_citacoes)
-    escreverCSV(Arquivos.NACIONALIDADE.value, id_lattes, texto=nacionalidade)
-    escreverCSV(Arquivos.ENDERECO_PROFISSIONAL.value, id_lattes, texto=endereco_profissional)
+    escreverCSV(Arquivos.NOME_CITACOES, id_lattes, texto=nome_citacoes)
+    escreverCSV(Arquivos.NACIONALIDADE, id_lattes, texto=nacionalidade)
+    escreverCSV(Arquivos.ENDERECO_PROFISSIONAL, id_lattes, texto=endereco_profissional)
 
     #Gera lista com as principais formações academicas
     if formacao_academica_elements:
         lista_formacoes: list[str] = gerarListaPadrao(formacao_academica_elements)
-        escreverCSV(Arquivos.FORMACOES.value, id_lattes, lista=lista_formacoes)
+        escreverCSV(Arquivos.FORMACOES, id_lattes, lista=lista_formacoes)
 
     #Gera lista com as formações complementares
     if formacao_complementar_elements:
         lista_formacoes_complementares: list[str] = gerarListaPadrao(formacao_complementar_elements)
-        escreverCSV(Arquivos.FORMACOES_COMPLEMENTARES.value, id_lattes, lista=lista_formacoes_complementares)
+        escreverCSV(Arquivos.FORMACOES_COMPLEMENTARES, id_lattes, lista=lista_formacoes_complementares)
 
     #Gera lista com as atuações profissionais
     if atuacao_profissional_elements:
         atuacao_profissional_elements = atuacao_profissional_elements[2:]
         lista_atuacoes_profissionais: list[str] = gerarListaAtuacao(atuacao_profissional_elements)
-        escreverCSV(Arquivos.ATUACOES_PROFISSIONAIS.value, id_lattes, lista=lista_atuacoes_profissionais)
+        escreverCSV(Arquivos.ATUACOES_PROFISSIONAIS, id_lattes, lista=lista_atuacoes_profissionais)
 
     #Gera lista com as áreas de atuação
     #A conversao para int serve apenas para ignorar a numeração das áreas de atuação e extrair somente o texto relevante
@@ -93,17 +93,17 @@ def extrairDadosCurriculo():
             except:
                 lista_area_atuacao.append(texto)
 
-        escreverCSV(Arquivos.AREA_ATUACAO.value, id_lattes, lista=lista_area_atuacao)
+        escreverCSV(Arquivos.AREA_ATUACAO, id_lattes, lista=lista_area_atuacao)
 
     #Gera lista com os idiomas falados
     if idiomas_elements:
         lista_idiomas: list[str] = gerarListaPadrao(idiomas_elements)
-        escreverCSV(Arquivos.IDIOMAS.value, id_lattes, lista=lista_idiomas)
+        escreverCSV(Arquivos.IDIOMAS, id_lattes, lista=lista_idiomas)
 
     #Gera lista com os premios recebidos
     if premios_elements:
         lista_premios: list[str] = gerarListaPadrao(premios_elements)
-        escreverCSV(Arquivos.PREMIOS.value, id_lattes, lista=lista_premios)
+        escreverCSV(Arquivos.PREMIOS, id_lattes, lista=lista_premios)
 
 
     #Gera lista de produções
@@ -119,7 +119,7 @@ def extrairDadosCurriculo():
             except:
                 lista_producoes.append(f'{trabalhos} | {citacoes} | {detalhes}')
 
-        escreverCSV(Arquivos.PRODUCOES.value, id_lattes, lista=lista_producoes)
+        escreverCSV(Arquivos.PRODUCOES, id_lattes, lista=lista_producoes)
 
     #Gera lista de Artigos
     if artigos_elements:
@@ -128,7 +128,7 @@ def extrairDadosCurriculo():
             texto: str = element.text.replace('\n', '').replace('\t', '')
             lista_artigos.append(texto)
 
-        escreverCSV(Arquivos.ARTIGOS_CURRICULO.value, id_lattes, lista=lista_artigos)
+        escreverCSV(Arquivos.ARTIGOS_CURRICULO, id_lattes, lista=lista_artigos)
     
 
     return id_lattes

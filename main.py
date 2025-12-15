@@ -5,18 +5,18 @@ from extracaoDadosProducao import extrairDadosProducao
 from utils import escreverCSV
 from deletarArquivos import deletarArquivosTemporarios
 import os
-from nomes_arquivos_enum import Arquivos
-from criarPastas import CriarPastas
+import nomes_arquivos as Arquivos
+import criarPastas
 from processados import NomeProcessado, AnotarNomeProcessado
 import logs
 from logs import logger
 
 def main(nome: str):
     #Variaveis contendo o caminho da pasta temp e os nomes dos arquivos com as extensões
-    temp = Arquivos.PASTA_TEMP.value
-    curriculo = Arquivos.CURRICULO.value
-    producao = Arquivos.PRODUCAO.value
-    csv_erro = Arquivos.ERRO.value
+    temp = Arquivos.PASTA_TEMP
+    curriculo = Arquivos.CURRICULO
+    producao = Arquivos.PRODUCAO
+    csv_erro = Arquivos.ERRO
     curriculo = curriculo.split('/')[-1]
     producao = producao.split('/')[-1]
 
@@ -38,7 +38,7 @@ def main(nome: str):
 
 if __name__== "__main__":
     logger.info('Execução iniciada')
-    input_csv = Arquivos.INPUT.value
+    input_csv = Arquivos.INPUT
     
     with open(input_csv) as csv:
         row = csv.readline()

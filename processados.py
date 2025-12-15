@@ -1,7 +1,7 @@
-from nomes_arquivos_enum import Arquivos
+import nomes_arquivos as Arquivos
 import os
 
-arquivo_lista_nomes_processados = Arquivos.LISTA_NOMES_PROCESSADOS.value
+arquivo_lista_nomes_processados = Arquivos.LISTA_NOMES_PROCESSADOS
 
 def NomeProcessado(nome: str) -> Bool:
     lista_nomes_processados = []
