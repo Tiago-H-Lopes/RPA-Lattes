@@ -10,14 +10,24 @@ def extrairDadosProducao(id_lattes: str) -> None:
     soup = BeautifulSoup(html, 'html.parser')
     elements = soup.find_all('div', class_='grafico')
 
-    lista_prod_bibliograficas = gerarListaProducao(elements, 'Produção Bibliográfica')
-    lista_prod_tecnica = gerarListaProducao(elements, 'Produção Técnica')
-    lista_orientacoes = gerarListaProducao(elements, 'Orientações Concluídas')
-    lista_todas_prod = gerarListaProducao(elements, 'Todas as Produções')
-    lista_artigos = gerarListaProducaoArtigos(elements, 'Total de Artigos Publicados por Periódico', soup)
+    if elements:
+        lista_prod_bibliograficas = gerarListaProducao(elements, 'Produção Bibliográfica')
+        lista_prod_tecnica = gerarListaProducao(elements, 'Produção Técnica')
+        lista_orientacoes = gerarListaProducao(elements, 'Orientações Concluídas')
+        lista_todas_prod = gerarListaProducao(elements, 'Todas as Produções')
+        lista_artigos = gerarListaProducaoArtigos(elements, 'Total de Artigos Publicados por Periódico', soup)
 
-    escreverCSV(Arquivos.PRODUCOES_BIBLIOGRAFICAS.value, id_lattes, lista_prod_bibliograficas)
-    escreverCSV(Arquivos.PRODUCOES_TECNICAS.value, id_lattes, lista_prod_tecnica)
-    escreverCSV(Arquivos.ORIENTACOES.value, id_lattes, lista_orientacoes)
-    escreverCSV(Arquivos.TODAS_PRODUCOES.value, id_lattes, lista_todas_prod)
-    escreverCSV(Arquivos.ARTIGOS_PRODUCAO.value, id_lattes, lista_artigos)
+    if lista_prod_bibliograficas:
+        escreverCSV(Arquivos.PRODUCOES_BIBLIOGRAFICAS.value, id_lattes, lista_prod_bibliograficas)
+
+    if lista_prod_tecnica:
+        escreverCSV(Arquivos.PRODUCOES_TECNICAS.value, id_lattes, lista_prod_tecnica)
+
+    if lista_orientacoes:
+        escreverCSV(Arquivos.ORIENTACOES.value, id_lattes, lista_orientacoes)
+
+    if lista_todas_prod:
+        escreverCSV(Arquivos.TODAS_PRODUCOES.value, id_lattes, lista_todas_prod)
+        
+    if lista_artigos:
+        escreverCSV(Arquivos.ARTIGOS_PRODUCAO.value, id_lattes, lista_artigos)
