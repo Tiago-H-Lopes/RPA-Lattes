@@ -1,24 +1,22 @@
+import os
+import logs
+import criarPastas
+from utils import escreverCSV
 from acessarLattes import extrairDadosLattes
+from deletarArquivos import deletarArquivosTemporarios
+from extracaoDadosProducao import extrairDadosProducao
 from extracaoDadosCurriculo import extrairDadosCurriculo
 from extracaoDadosDiretorio import extrairDadosDiretorio
-from extracaoDadosProducao import extrairDadosProducao
-from utils import escreverCSV
-from deletarArquivos import deletarArquivosTemporarios
-import os
-import nomes_arquivos as Arquivos
-import criarPastas
 from processados import NomeProcessado, AnotarNomeProcessado
-import logs
+from nomes_arquivos import PASTA_TEMP, CURRICULO, PRODUCAO, ERRO, INPUT
 from logs import logger
 
 def main(nome: str):
     #Variaveis contendo o caminho da pasta temp e os nomes dos arquivos com as extensões
-    temp = Arquivos.PASTA_TEMP
-    curriculo = Arquivos.CURRICULO
-    producao = Arquivos.PRODUCAO
-    csv_erro = Arquivos.ERRO
-    curriculo = curriculo.split('/')[-1]
-    producao = producao.split('/')[-1]
+    temp = PASTA_TEMP
+    curriculo = CURRICULO.name
+    producao = PRODUCAO.name
+    csv_erro = ERRO
 
     extrairDadosLattes(nome)
     lista_arquivos = os.listdir(temp)
@@ -38,7 +36,7 @@ def main(nome: str):
 
 if __name__== "__main__":
     logger.info('Execução iniciada')
-    input_csv = Arquivos.INPUT
+    input_csv = INPUT
     
     with open(input_csv) as csv:
         row = csv.readline()

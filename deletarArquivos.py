@@ -6,8 +6,8 @@ def deletarArquivosTemporarios() -> None:
     arquivos = os.listdir(temp)
     curriculo = Arquivos.CURRICULO
     producao = Arquivos.PRODUCAO
-    curriculo = curriculo.split('/')[-1]
-    producao = producao.split('/')[-1]
+    curriculo = curriculo.name
+    producao = producao.name
     remover = [curriculo, producao]
     for arquivo in arquivos:
         if arquivo in remover:
