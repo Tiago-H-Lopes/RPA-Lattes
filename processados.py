@@ -1,7 +1,10 @@
-import nomes_arquivos as Arquivos
+from nomes_arquivos import LISTA_NOMES_PROCESSADOS
 import os
 
-arquivo_lista_nomes_processados = Arquivos.LISTA_NOMES_PROCESSADOS
+arquivo_lista_nomes_processados = LISTA_NOMES_PROCESSADOS
+
+with open(arquivo_lista_nomes_processados, 'w', encoding='utf-8') as arquivo:
+    arquivo.write('')
 
 def NomeProcessado(nome: str) -> bool:
     lista_nomes_processados = []

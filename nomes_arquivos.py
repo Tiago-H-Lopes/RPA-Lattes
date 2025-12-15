@@ -4,6 +4,7 @@ from pathlib import Path
 PASTA_INPUT = Path('Input')
 PASTA_OUTPUT = Path('Output')
 PASTA_TEMP = Path('Temp')
+PASTA_LOGS = Path('Logs')
 
 #ARQUIVOS GERAIS
 INPUT = PASTA_INPUT / 'LATTES_INPUT_example.csv'

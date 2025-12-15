@@ -1,6 +1,6 @@
 import os
-import logs
 import criarPastas
+import logs
 from utils import escreverCSV
 from acessarLattes import extrairDadosLattes
 from deletarArquivos import deletarArquivosTemporarios

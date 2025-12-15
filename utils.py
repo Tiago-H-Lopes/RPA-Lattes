@@ -1,5 +1,6 @@
 from bs4 import Tag, BeautifulSoup
 import re
+from pathlib import Path
 
 def pegarElementosCabecalho(tagName: str, div: Tag) -> list[Tag]:
     #Lista com tags que seguem o mesmo padrão de extração
@@ -155,7 +156,7 @@ def gerarListaProducaoArtigos(elements: Tag, titulo_procurado: str, soup: Beauti
 
     return lista
 
-def escreverCSV(arquivo: str, id_lattes: str, lista: list[str] = None, texto: str = None):    
+def escreverCSV(arquivo: Path, id_lattes: str, lista: list[str] = None, texto: str = None):    
     if(lista==None and texto==None):
         return
     with open(arquivo, 'a+', encoding='utf-8') as csv:
@@ -163,7 +164,7 @@ def escreverCSV(arquivo: str, id_lattes: str, lista: list[str] = None, texto: st
         csv.seek(0)
         texto_csv = csv.readline()
         if texto_csv=='':
-            nome_arquivo = arquivo.split('/')[-1]
+            nome_arquivo = arquivo.name
             titulo = nome_arquivo.replace('LATTES_OUTPUT_', '').replace('.csv', '')
             csv.write(f'LATTES_ID; {titulo}\n')
         
