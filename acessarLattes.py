@@ -91,7 +91,7 @@ def extrairDadosLattes(nome: str) -> None:
                 loop = False
 
         except Exception as e:
-            logger.error(e)
+            logger.debug(e)
 
 def extrairGraficosProducao(sb: BaseCase):
     try:

@@ -30,7 +30,7 @@ def main(nome: str):
             AnotarNomeProcessado(nome)    
     else:
         escreverCSV(csv_erro, nome, texto='Não foi possivel baixar o curriculo')
-        logger.warning(f'Não foi possivel baixar o curriculo de {nome}')
+        logger.warning(f'Não foi possivel acessar o curriculo de {nome}')
         AnotarNomeProcessado(nome)
 
 
