@@ -1,8 +1,20 @@
 from bs4 import BeautifulSoup
 from bs4.element import Tag
-from utils import gerarListaAtuacao, gerarListaPadrao, pegarElementosCabecalho, escreverCSV
+from utils import escreverCSV
 import nomes_arquivos as Arquivos
+from pathlib import Path
 
+def pegarElementosCabecalho(tagName: str, div: Tag) -> list[Tag]:
+        if tagName=='ProducoesCientificas':
+            producoes_elements_trabalhos: list[Tag] = div.select('div.trab')
+            producoes_elements_citacoes: list[Tag] = div.select('div.cita')
+            producoes_elements_fator: list[Tag] = div.select('div.fator')
+            producoes_elements_detalhes: list[Tag] = div.select('div.detalhes')
+            return producoes_elements_trabalhos, producoes_elements_citacoes, producoes_elements_fator, producoes_elements_detalhes
+        else:
+            elements: list[Tag] = div.select('div.layout-cell-pad-5')
+            return elements
+            
 
 def extrairElemento(elements: list[Tag], informacao_procurada: str) -> str:
     contador = 0
@@ -11,6 +23,120 @@ def extrairElemento(elements: list[Tag], informacao_procurada: str) -> str:
         if texto == informacao_procurada:
             return elements[contador+1].text
         contador += 1
+
+
+
+def extrairDadosGerais(div_list: list[Tag], id_lattes: int | str, caminho_pasta_output: Path):
+    for div in div_list:
+        try:
+            dicionario = {}
+            tagName = div.find('a').get('name').upper()
+            texto = div.select('div.layout-cell-pad-5')
+            lista_ignorar_tags = ['identificacao']
+            if not texto:
+                print(f'{tagName} - Vazio')
+                continue
+            if tagName.lower() in lista_ignorar_tags:
+                continue
+            
+            print(tagName)
+            contador = 0
+            dicionario['Titulo'] = tagName
+            for t in texto:
+                if contador==0:
+                    chave = t.text
+                    contador += 1
+                else:
+                    valor: str = t.text
+                    valor = valor.replace('\n',' ').replace('\t', '')
+                    if valor:
+                        dicionario[chave] = valor
+                    contador = 0
+            if dicionario:
+
+                caminho = caminho_pasta_output / f'LATTES_OUTPUT_{tagName}.csv'
+                escreverCSV(caminho, id_lattes, dicionario=dicionario)
+        except:
+            pass
+
+
+def extrairDadosArtigos(soup: BeautifulSoup, id_lattes: int | str, caminho: Path):
+    resultados = []
+    # Todos os <b> que aparecem dentro de um bloco 'cita-artigos'
+    for b in soup.select("div.title-wrapper div.cita-artigos > b"):
+        cabecalho = b.get_text(strip=True).strip('"')
+        if not cabecalho: continue
+        valor = None
+        
+
+        # Itera pelos elementos à frente deste <b> no fluxo do documento
+        for node in b.next_elements:
+            if isinstance(node, Tag):
+                # Se aparecer um novo bloco 'cita-artigos', encerramos a busca para este cabeçalho
+                if node.name == "div" and "cita-artigos" in (node.get("class") or []):
+                    break
+
+                if node.name == "div" and "title-wrapper" in (node.get("class") or []):
+                    break
+
+                # Se aparecer outro <b> (um novo cabeçalho), também encerramos
+                if node.name == "b":
+                    continue
+
+                # Primeiro <span class="transform"> encontrado vira o valor
+                if node.name == "span" and "transform" in (node.get("class") or []):
+                    valor = node.get_text(strip=True)
+                    dicionario = {}
+                    dicionario[cabecalho] = valor
+                    resultados.append(dicionario)
+                    continue  # achou o valor, pode parar
+
+    for resultado in resultados:
+        escreverCSV(caminho, id_lattes, dicionario=resultado)
+
+
+def extrairDadosEventos(soup: BeautifulSoup, id_lattes: int | str, caminho: Path):
+    resultados = []
+    valores = []
+    run = False
+    # Todos os <b> que aparecem dentro de um bloco 'cita-artigos'
+    for b in soup.select("div.title-wrapper div.inst_back > b"):
+        cabecalho = b.get_text(strip=True).strip('"')  # remova .strip('"') se quiser manter as aspas
+        if cabecalho == 'Participação em eventos, congressos, exposições e feiras':
+            run = True
+        if run:
+            if not cabecalho: continue
+            valor = None
+            print(cabecalho)
+
+            # Itera pelos elementos à frente deste <b> no fluxo do documento
+            for node in b.next_elements:
+                if isinstance(node, Tag):
+                    # Se aparecer um novo bloco 'inst_back', encerramos a busca para este cabeçalho
+                    if node.name == "div" and "inst_back" in (node.get("class") or []):
+                        break
+
+                    if node.name == "div" and "title-wrapper" in (node.get("class") or []):
+                        break
+
+                    # Se aparecer outro <b> (um novo cabeçalho), também encerramos
+                    if node.name == "b":
+                        continue
+
+                    # Primeiro <span class="transform"> encontrado vira o valor
+                    if node.name == "span" and "transform" in (node.get("class") or []):
+                        valor = node.get_text(strip=True)
+                        valor = valor.replace('\n', ' ').replace('\t', '')
+                        dicionario = {}
+                        dicionario[cabecalho] = valor
+                        if not valor in valores:
+                            valores.append(valor)
+                            resultados.append(dicionario)
+                        continue  # achou o valor, pode parar
+
+    for resultado in resultados:
+        escreverCSV(caminho, id_lattes, dicionario=resultado)
+
 
 def extrairDadosCurriculo():
     curriculo = Arquivos.CURRICULO
@@ -22,6 +148,8 @@ def extrairDadosCurriculo():
             html = f.read()
 
     soup = BeautifulSoup(html, 'html.parser')
+
+
 
     #Pega as informações do autor
     ul = soup.find('ul', class_='informacoes-autor')
@@ -35,26 +163,25 @@ def extrairDadosCurriculo():
     escreverCSV(Arquivos.ULTIMA_ATUALIZACAO, id_lattes, texto=ultima_atualizacao)
     escreverCSV(Arquivos.RESUMO, id_lattes, texto=resumo)
 
+    div_list = soup.find_all('div', class_='title-wrapper')
+    extrairDadosGerais(div_list, id_lattes, Arquivos.PASTA_OUTPUT)
+    extrairDadosArtigos(soup, id_lattes, Arquivos.PRODUCOES_ARTIGOS_BANCAS)
+    extrairDadosEventos(soup, id_lattes, Arquivos.EVENTOS)
 
 
     #Pega os blocos de elementos da página, como, Identificação, Endereço, Formação Academica, Atução etc
     #Cada item na lista representa um bloco completo com os elementos da página, item 0 = todo o bloco de informações de identificação; item 1 = todo o bloco sobre endereço etc
-    citacoes_elements, endereco_elements, formacao_academica_elements, formacao_academica_pos_douturado_elements, formacao_complementar_elements, atuacao_profissional_elements, area_atuacao_elements, idiomas_elements, premios_elements, producoes_elements_trabalhos, producoes_elements_citacoes, producoes_elements_fator, producoes_elements_detalhes, artigos_elements = (None,)*14
+    citacoes_elements = None
+    producoes_elements_trabalhos = None
+    producoes_elements_citacoes = None
+    producoes_elements_fator = None
+    producoes_elements_detalhes = None
     div_list = soup.find_all('div', class_='title-wrapper')
     for div in div_list:
         try:
             tagName = div.find('a').get('name')
-            match tagName:
-                case 'Identificacao': citacoes_elements = pegarElementosCabecalho(tagName, div)
-                case 'Endereco': endereco_elements = pegarElementosCabecalho(tagName, div)
-                case 'FormacaoAcademicaTitulacao': formacao_academica_elements = pegarElementosCabecalho(tagName, div)
-                case 'FormacaoAcademicaPosDoutorado': formacao_academica_pos_douturado_elements = pegarElementosCabecalho(tagName, div)
-                case 'FormacaoComplementar': formacao_complementar_elements = pegarElementosCabecalho(tagName, div)
-                case 'AtuacaoProfissional': atuacao_profissional_elements = pegarElementosCabecalho(tagName, div)
-                case 'AreasAtuacao': area_atuacao_elements = pegarElementosCabecalho(tagName, div)
-                case 'Idiomas': idiomas_elements = pegarElementosCabecalho(tagName, div)
-                case 'PremiosTitulos': premios_elements = pegarElementosCabecalho(tagName, div)
-                case 'ProducoesCientificas': producoes_elements_trabalhos, producoes_elements_citacoes, producoes_elements_fator, producoes_elements_detalhes, artigos_elements = pegarElementosCabecalho(tagName, div)
+            if tagName == 'Identificacao': citacoes_elements = pegarElementosCabecalho(tagName, div)
+            if tagName == 'ProducoesCientificas': producoes_elements_trabalhos, producoes_elements_citacoes, producoes_elements_fator, producoes_elements_detalhes = pegarElementosCabecalho(tagName, div)
         except:
             pass
             
@@ -62,55 +189,8 @@ def extrairDadosCurriculo():
     #Pega as informações de citações e endereço
     nome_citacoes = extrairElemento(citacoes_elements, 'Nome em citações bibliográficas')
     nacionalidade = extrairElemento(citacoes_elements, 'País de Nacionalidade')
-    endereco_profissional = extrairElemento(endereco_elements, 'Endereço Profissional')
     escreverCSV(Arquivos.NOME_CITACOES, id_lattes, texto=nome_citacoes)
     escreverCSV(Arquivos.NACIONALIDADE, id_lattes, texto=nacionalidade)
-    escreverCSV(Arquivos.ENDERECO_PROFISSIONAL, id_lattes, texto=endereco_profissional)
-
-    #Gera lista com as principais formações academicas
-    if formacao_academica_elements:
-        lista_formacoes: list[str] = gerarListaPadrao(formacao_academica_elements)
-        escreverCSV(Arquivos.FORMACOES, id_lattes, lista=lista_formacoes)
-    
-    #Gera lista com os pós doutorados
-    if formacao_academica_pos_douturado_elements:
-        lista_pos_doutorado: list[str] = gerarListaPadrao(formacao_academica_elements)
-        escreverCSV(Arquivos.FORMACOES_POS_DOUTORADO, id_lattes, lista=lista_pos_doutorado)
-
-    #Gera lista com as formações complementares
-    if formacao_complementar_elements:
-        lista_formacoes_complementares: list[str] = gerarListaPadrao(formacao_complementar_elements)
-        escreverCSV(Arquivos.FORMACOES_COMPLEMENTARES, id_lattes, lista=lista_formacoes_complementares)
-
-    #Gera lista com as atuações profissionais
-    if atuacao_profissional_elements:
-        atuacao_profissional_elements = atuacao_profissional_elements[2:]
-        lista_atuacoes_profissionais: list[str] = gerarListaAtuacao(atuacao_profissional_elements)
-        escreverCSV(Arquivos.ATUACOES_PROFISSIONAIS, id_lattes, lista=lista_atuacoes_profissionais)
-
-    #Gera lista com as áreas de atuação
-    #A conversao para int serve apenas para ignorar a numeração das áreas de atuação e extrair somente o texto relevante
-    if area_atuacao_elements:
-        lista_area_atuacao: list[str] = []
-        for element in area_atuacao_elements:
-            texto = element.text
-            try:
-                texto = int(texto[0])
-            except:
-                lista_area_atuacao.append(texto)
-
-        escreverCSV(Arquivos.AREA_ATUACAO, id_lattes, lista=lista_area_atuacao)
-
-    #Gera lista com os idiomas falados
-    if idiomas_elements:
-        lista_idiomas: list[str] = gerarListaPadrao(idiomas_elements)
-        escreverCSV(Arquivos.IDIOMAS, id_lattes, lista=lista_idiomas)
-
-    #Gera lista com os premios recebidos
-    if premios_elements:
-        lista_premios: list[str] = gerarListaPadrao(premios_elements)
-        escreverCSV(Arquivos.PREMIOS, id_lattes, lista=lista_premios)
-
 
     #Gera lista de produções
     if producoes_elements_trabalhos:
@@ -126,17 +206,11 @@ def extrairDadosCurriculo():
                 lista_producoes.append(f'{trabalhos} | {citacoes} | {detalhes}')
 
         escreverCSV(Arquivos.PRODUCOES, id_lattes, lista=lista_producoes)
-
-    #Gera lista de Artigos
-    if artigos_elements:
-        lista_artigos: list[str] = []
-        for element in artigos_elements:
-            texto: str = element.text.replace('\n', '').replace('\t', '')
-            lista_artigos.append(texto)
-
-        escreverCSV(Arquivos.ARTIGOS_CURRICULO, id_lattes, lista=lista_artigos)
     
 
     return id_lattes
+
+
+
 if __name__== "__main__":
     extrairDadosCurriculo()

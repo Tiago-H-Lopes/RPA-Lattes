@@ -8,7 +8,7 @@ from extracaoDadosProducao import extrairDadosProducao
 from extracaoDadosCurriculo import extrairDadosCurriculo
 from extracaoDadosDiretorio import extrairDadosDiretorio
 from processados import NomeProcessado, AnotarNomeProcessado
-from nomes_arquivos import PASTA_TEMP, CURRICULO, PRODUCAO, ERRO, INPUT
+from nomes_arquivos import PASTA_TEMP, CURRICULO, PRODUCAO, ERRO, INPUT, NOMES_IDS
 from logs import logger
 
 def main(nome: str):
@@ -23,6 +23,8 @@ def main(nome: str):
     if curriculo in lista_arquivos:
         id_lattes = extrairDadosCurriculo()
         extrairDadosDiretorio(id_lattes)
+        escreverCSV(NOMES_IDS, id_lattes, texto=nome)
+
         
         if producao in lista_arquivos:
             extrairDadosProducao(id_lattes)  
