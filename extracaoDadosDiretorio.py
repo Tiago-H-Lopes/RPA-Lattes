@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup, Tag
 from utils import gerarListaDiretorio, escreverCSV
-from nomes_arquivos import GRUPOS_PESQUISA, GRUPOS_ATUACAO, LINHA_ATUACAO
+from nomes_arquivos import GRUPOS_PESQUISA, GRUPOS_ATUACAO, LINHA_ATUACAO, TITULACAO, PASTA_OUTPUT
 from logs import logger
 
 def extrairDadosDiretorio(lattes_id: str) -> None:
@@ -20,35 +20,64 @@ def extrairDadosDiretorio(lattes_id: str) -> None:
         for element in groupos_elements:
             try:
                 texto: str = element.text.replace('\n', '')
-                print(texto)
                 if(texto.startswith('Áreas de atuação:')):
                     lista = texto.split('\t')
                     lista_grupos_pesquisa = [item.strip() for item in lista if item.strip()]
                     lista_grupos_pesquisa.pop(0)
-                    
+
                 if(texto.startswith('Titulação')):
                     texto = texto.replace('\t', '')
                     valores = texto.split(':')
-                    titulacao = valores[1].strip()
-                    
+                    titulacao = valores[1].strip()                    
             except:
                 pass
         
-        print(titulacao)
+        if titulacao:
+            escreverCSV(TITULACAO, lattes_id, texto=titulacao)
         if lista_grupos_pesquisa:
             escreverCSV(GRUPOS_PESQUISA, lattes_id, lista_grupos_pesquisa)
-        
-        grupos_pesquisa_elements = soup.find('div', id='gruposPesquisa')
-        if grupos_pesquisa_elements:
-            rows = grupos_pesquisa_elements.find_all('td', role='gridcell')
-            lista_grupos_atuacao = gerarListaDiretorio(rows, 3)
-            escreverCSV(GRUPOS_ATUACAO, lattes_id, lista_grupos_atuacao)
-                
-        linhas = soup.find('div', id='linhasPesquisa')
-        if linhas:
-            rows = linhas.find_all('td', role='gridcell')
-            lista_linhas_atuacao = gerarListaDiretorio(rows, 2)
-            escreverCSV(LINHA_ATUACAO, lattes_id, lista_linhas_atuacao)
+
+        elements = soup.select('span > div')
+        for element in elements:
+            id = element.get('id')
+            if not id : continue
+            if id == 'dadosGerais': continue
+
+            titulo = element.select_one('legend')
+            if not titulo: continue
+
+            titulo = titulo.get_text(strip=True)
+            cabecalhos = element.select('span')
+            lista_cabecalhos = []
+            lista_cabecalhos_ignorar = ['IOEPEMC', 'ui-button', 'Ações']
+            for cabecalho in cabecalhos:
+                texto = cabecalho.text
+                if texto in lista_cabecalhos_ignorar : continue
+                if texto:
+                    lista_cabecalhos.append(texto)
+
+            valores = element.select('td')
+            lista_valores = []
+            lista_valores_ignorar = ['Nenhum registro adicionado']
+            for valor in valores:
+                texto = valor.text
+                if texto.startswith('Visualizar espelho'): continue
+                if texto in lista_valores_ignorar: continue
+
+                if valor.text:
+                    lista_valores.append(valor.text)
+
+            contador = 0
+            titulo = titulo.replace(' ', '_').upper()
+            caminho = PASTA_OUTPUT / f'LATTES_OUTPUT_{titulo}.csv'
+            for valor in lista_valores:
+                contador = 0 if contador == len(lista_cabecalhos) else contador
+                cabecalho = lista_cabecalhos[contador]
+                dicionario = {}
+                dicionario[cabecalho] = valor
+                escreverCSV(caminho, lattes_id, dicionario=dicionario)
+                contador += 1
+
     else:
         logger.error(f'Não foi possivel acessar a url {url}, status code: {response.status_code}')
 
