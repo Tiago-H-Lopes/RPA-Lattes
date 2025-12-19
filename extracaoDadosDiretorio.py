@@ -6,24 +6,35 @@ from logs import logger
 
 def extrairDadosDiretorio(lattes_id: str) -> None:
     url = f'http://dgp.cnpq.br/dgp/espelhorh/{lattes_id}'
+    logger.info(f'Usando método Get na url: {url}')
     response = requests.get(url)
     if(response.status_code==200):
+        logger.info(f'URL Acessada com sucesso, inicando extração de dados')
         html = response.text
         soup = BeautifulSoup(html, 'html.parser')
 
         #Coleta as informações de grupo de pesquisa e retorna uma lista
         groupos_elements: list[Tag] = soup.find_all('div', class_='control-group')
         lista_grupos_pesquisa = []
+        titulacao = ''
         for element in groupos_elements:
             try:
                 texto: str = element.text.replace('\n', '')
+                print(texto)
                 if(texto.startswith('Áreas de atuação:')):
                     lista = texto.split('\t')
                     lista_grupos_pesquisa = [item.strip() for item in lista if item.strip()]
                     lista_grupos_pesquisa.pop(0)
+                    
+                if(texto.startswith('Titulação')):
+                    texto = texto.replace('\t', '')
+                    valores = texto.split(':')
+                    titulacao = valores[1].strip()
+                    
             except:
                 pass
-
+        
+        print(titulacao)
         if lista_grupos_pesquisa:
             escreverCSV(GRUPOS_PESQUISA, lattes_id, lista_grupos_pesquisa)
         
