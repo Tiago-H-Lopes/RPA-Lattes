@@ -47,7 +47,7 @@ if __name__== "__main__":
                 nome = csv.readline().strip()
                 if not NomeProcessado(nome):
                     logger.info(f'Processando {nome}')
-                    deletarArquivosTemporarios()
+                    #deletarArquivosTemporarios()
                     main(nome)
                     
             # except Exception as e:

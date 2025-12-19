@@ -39,8 +39,8 @@ def extrairDadosLattes(nome: str) -> None:
             curriculo = CURRICULO.name
             producao = PRODUCAO.name
 
-            if curriculo in lista_diretorio and producao in lista_diretorio:
-                break
+            # if curriculo in lista_diretorio and producao in lista_diretorio:
+            #     break
 
             with SB(uc=True) as sb:
                 sb.open(URL)
@@ -49,8 +49,7 @@ def extrairDadosLattes(nome: str) -> None:
                 #Abre a janela do perfil procurado
                 sb.type('[name="textoBusca"]', nome)
                 sb.click("#botaoBuscaFiltros")
-                sleep(3)
-                primeiro_nome = nome.split(' ')[0].capitalize()
+                sleep(300)
                 titulo: str = sb.find_element('//div[@class="tit_form"]', by='xpath').text
 
                 #Se não encontrar nenhum resultado para o nome pesquisado
@@ -129,6 +128,7 @@ def extrairCurriculo(sb: BaseCase):
         with open(CURRICULO, "w", encoding="utf-8") as f:
             f.write(html)
             f.close()
+        sleep(5000)
     else:
         logger.warning('Erro ao abrir a página do curriculo')
         raise Exception('Erro ao abrir a página do curriculo')

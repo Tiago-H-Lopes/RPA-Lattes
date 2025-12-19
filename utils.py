@@ -156,17 +156,21 @@ def gerarListaProducaoArtigos(elements: Tag, titulo_procurado: str, soup: Beauti
 
     return lista
 
-def escreverCSV(arquivo: Path, id_lattes: str, lista: list[str] = None, texto: str = None):    
-    if(lista==None and texto==None):
+def escreverCSV(arquivo: Path, id_lattes: str, lista: list[str] = None, texto: str = None, dicionario: dict = None):    
+    if(lista==None and texto==None and dicionario==None):
         return
     with open(arquivo, 'a+', encoding='utf-8') as csv:
+        titulo = ''
 
         csv.seek(0)
         texto_csv = csv.readline()
         if texto_csv=='':
-            nome_arquivo = arquivo.name
-            titulo = nome_arquivo.replace('LATTES_OUTPUT_', '').replace('.csv', '')
-            csv.write(f'LATTES_ID; {titulo}\n')
+            if not dicionario:
+                nome_arquivo = arquivo.name
+                titulo = nome_arquivo.replace('LATTES_OUTPUT_', '').replace('.csv', '')
+                csv.write(f'LATTES_ID; {titulo}\n')
+            else:
+                csv.write(f'LATTES_ID; TITULO; CHAVE; VALOR\n')
         
         csv.seek(0, 2)
         if lista:
@@ -174,3 +178,14 @@ def escreverCSV(arquivo: Path, id_lattes: str, lista: list[str] = None, texto: s
                 csv.write(f'{id_lattes}; "{item}"\n')
         if texto:
                 csv.write(f'{id_lattes}; "{texto}"\n')
+        if dicionario:
+            for chave, valor in dicionario.items():
+                if chave:
+                    chave_anterior = chave
+                if not titulo:
+                    titulo = chave_anterior
+                    
+                if chave=='Titulo':
+                    titulo = valor
+                else:
+                    csv.write(f'{id_lattes}; {titulo}; "{chave_anterior}"; "{valor}"\n')

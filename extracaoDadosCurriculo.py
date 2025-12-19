@@ -39,8 +39,8 @@ def extrairDadosCurriculo():
 
     #Pega os blocos de elementos da página, como, Identificação, Endereço, Formação Academica, Atução etc
     #Cada item na lista representa um bloco completo com os elementos da página, item 0 = todo o bloco de informações de identificação; item 1 = todo o bloco sobre endereço etc
+    citacoes_elements, endereco_elements, formacao_academica_elements, formacao_academica_pos_douturado_elements, formacao_complementar_elements, atuacao_profissional_elements, area_atuacao_elements, idiomas_elements, premios_elements, producoes_elements_trabalhos, producoes_elements_citacoes, producoes_elements_fator, producoes_elements_detalhes, artigos_elements = (None,)*14
     div_list = soup.find_all('div', class_='title-wrapper')
-    citacoes_elements, endereco_elements, formacao_academica_elements, formacao_complementar_elements, atuacao_profissional_elements, area_atuacao_elements, idiomas_elements, premios_elements, producoes_elements_trabalhos, producoes_elements_citacoes, producoes_elements_fator, producoes_elements_detalhes, artigos_elements = (None,)*13
     for div in div_list:
         try:
             tagName = div.find('a').get('name')
@@ -48,6 +48,7 @@ def extrairDadosCurriculo():
                 case 'Identificacao': citacoes_elements = pegarElementosCabecalho(tagName, div)
                 case 'Endereco': endereco_elements = pegarElementosCabecalho(tagName, div)
                 case 'FormacaoAcademicaTitulacao': formacao_academica_elements = pegarElementosCabecalho(tagName, div)
+                case 'FormacaoAcademicaPosDoutorado': formacao_academica_pos_douturado_elements = pegarElementosCabecalho(tagName, div)
                 case 'FormacaoComplementar': formacao_complementar_elements = pegarElementosCabecalho(tagName, div)
                 case 'AtuacaoProfissional': atuacao_profissional_elements = pegarElementosCabecalho(tagName, div)
                 case 'AreasAtuacao': area_atuacao_elements = pegarElementosCabecalho(tagName, div)
@@ -70,6 +71,11 @@ def extrairDadosCurriculo():
     if formacao_academica_elements:
         lista_formacoes: list[str] = gerarListaPadrao(formacao_academica_elements)
         escreverCSV(Arquivos.FORMACOES, id_lattes, lista=lista_formacoes)
+    
+    #Gera lista com os pós doutorados
+    if formacao_academica_pos_douturado_elements:
+        lista_pos_doutorado: list[str] = gerarListaPadrao(formacao_academica_elements)
+        escreverCSV(Arquivos.FORMACOES_POS_DOUTORADO, id_lattes, lista=lista_pos_doutorado)
 
     #Gera lista com as formações complementares
     if formacao_complementar_elements:
