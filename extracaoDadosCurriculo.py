@@ -3,6 +3,7 @@ from bs4.element import Tag
 from utils import escreverCSV
 import nomes_arquivos as Arquivos
 from pathlib import Path
+from logs import logger
 
 def pegarElementosCabecalho(tagName: str, div: Tag) -> list[Tag]:
         if tagName=='ProducoesCientificas':
@@ -138,8 +139,11 @@ def extrairDadosEventos(soup: BeautifulSoup, id_lattes: int | str, caminho: Path
         escreverCSV(caminho, id_lattes, dicionario=resultado)
 
 
-def extrairDadosCurriculo():
-    curriculo = Arquivos.CURRICULO
+def extrairDadosCurriculo(nome: str):
+    logger.debug(f'Extraindo dados do curriculo - {nome}')
+
+    curriculo_nome = Arquivos.CURRICULO.name.replace('{nome}', nome)
+    curriculo = Arquivos.CURRICULO.with_name(curriculo_nome)
     try:
         with open(curriculo, "r", encoding="utf-8") as f:
             html = f.read()

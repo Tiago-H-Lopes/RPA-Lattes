@@ -10,6 +10,7 @@ from nomes_arquivos import PASTA_TEMP, CURRICULO, PRODUCAO, ERRO
 import os
 import unicodedata
 from logs import logger
+from pathlib import Path
 
 def remover_acentos(texto):
     # Normaliza o texto para a forma NFD (decomposição)
@@ -29,6 +30,7 @@ def extrairDadosLattes(nome: str) -> None:
     MAX_TENTATIVAS = 5
     tentativa_atual = 0
 
+    logger.info(f'Iniciando extração de dados lattes para o nome {nome}')
     while(tentativa_atual < MAX_TENTATIVAS):
         try:
             tentativa_atual += 1
@@ -36,8 +38,12 @@ def extrairDadosLattes(nome: str) -> None:
             temp_path = PASTA_TEMP
             temp = os.path.join(diretorio_atual, temp_path)
             lista_diretorio = os.listdir(temp)
-            curriculo = CURRICULO.name
-            producao = PRODUCAO.name
+            curriculo_nome = CURRICULO.name.replace('{nome}', nome)
+            producao_nome = PRODUCAO.name.replace('{nome}', nome)
+            producao_path = PRODUCAO.with_name(producao_nome)
+            curriculo_path = CURRICULO.with_name(curriculo_nome)
+            curriculo = curriculo_path.name
+            producao = producao_path.name 
 
             # if curriculo in lista_diretorio and producao in lista_diretorio:
             #     break
@@ -49,9 +55,10 @@ def extrairDadosLattes(nome: str) -> None:
                 #Abre a janela do perfil procurado
                 sb.type('[name="textoBusca"]', nome)
                 sb.click("#botaoBuscaFiltros")
-                sleep(300)
+                sleep(3)
                 titulo: str = sb.find_element('//div[@class="tit_form"]', by='xpath').text
 
+                logger.debug(f'Chrome aberto - {nome}')
                 #Se não encontrar nenhum resultado para o nome pesquisado
                 if titulo.startswith('Nenhum resultado foi encontrado para'):
                     texto = f'Nenhum resultado foi encontrado'
@@ -79,20 +86,22 @@ def extrairDadosLattes(nome: str) -> None:
 
                 #Pega os graficos de prd
                 grafico_element_existe = sb.is_element_present('iframe.iframe-modal')
-                if(not 'producao.html' in lista_diretorio and grafico_element_existe):
-                    extrairGraficosProducao(sb) 
+                if(not producao in lista_diretorio and grafico_element_existe):
+                    logger.debug(f'Extraindo graficos de producao - {nome}')
+                    extrairGraficosProducao(sb, nome, producao_path) 
                     sb.switch_to_default_content()    
                 
                 #abre o curriculo
-                if(not 'curriculo.html' in lista_diretorio):
-                    extrairCurriculo(sb)
+                if(not curriculo in lista_diretorio):
+                    logger.debug(f'Extraindo curriculo - {nome}')
+                    extrairCurriculo(sb, nome, curriculo_path)
 
                 loop = False
 
         except Exception as e:
             logger.debug(e)
 
-def extrairGraficosProducao(sb: BaseCase):
+def extrairGraficosProducao(sb: BaseCase, nome: str, producao_path: Path):
     try:
         sb.is_element_present('iframe.iframe-modal')
         sb.switch_to_frame('iframe.iframe-modal')
@@ -101,7 +110,7 @@ def extrairGraficosProducao(sb: BaseCase):
         grafico_abriu = sb.find_element('//h2[@tabindex=0]')
         if grafico_abriu:
             html = sb.get_page_source()
-            with open(PRODUCAO, "w", encoding="utf-8") as f:
+            with open(producao_path, "w", encoding="utf-8") as f:
                 f.write(html)
         else:
             logger.warning('Falha ao abrir o gráfico')
@@ -113,7 +122,7 @@ def extrairGraficosProducao(sb: BaseCase):
         logger.error(e)
 
 
-def extrairCurriculo(sb: BaseCase):
+def extrairCurriculo(sb: BaseCase, nome: str, curriculo_path: Path):
     sb.click('#idbtnabrircurriculo')
     sleep(2) 
 
@@ -125,10 +134,10 @@ def extrairCurriculo(sb: BaseCase):
             sb.scroll_to_bottom()
         
         html = sb.get_page_source()       
-        with open(CURRICULO, "w", encoding="utf-8") as f:
+        with open(curriculo_path, "w", encoding="utf-8") as f:
             f.write(html)
             f.close()
-        sleep(5000)
+
     else:
         logger.warning('Erro ao abrir a página do curriculo')
         raise Exception('Erro ao abrir a página do curriculo')

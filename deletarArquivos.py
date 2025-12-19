@@ -1,13 +1,10 @@
 import os
-from nomes_arquivos import PASTA_TEMP, CURRICULO, PRODUCAO
+from nomes_arquivos import PASTA_TEMP
 
 def deletarArquivosTemporarios() -> None:
     temp = PASTA_TEMP
     arquivos = os.listdir(temp)
-    curriculo = CURRICULO.name
-    producao = PRODUCAO.name
-    remover = [curriculo, producao]
     for arquivo in arquivos:
-        if arquivo in remover:
+        if arquivo.endswith('.html'):
             arquivo = os.path.join(os.curdir, temp, arquivo)
             os.remove(arquivo)

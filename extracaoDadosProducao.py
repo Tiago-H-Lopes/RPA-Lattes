@@ -1,9 +1,13 @@
 from bs4 import BeautifulSoup, Tag
 from utils import gerarListaProducao, gerarListaProducaoArtigos, escreverCSV
 import nomes_arquivos as Arquivos
+from logs import logger
 
-def extrairDadosProducao(id_lattes: str) -> None:
-    producao = Arquivos.PRODUCAO
+def extrairDadosProducao(id_lattes: int | str, nome: str) -> None:
+    logger.debug(f'Extraindo dado producao - {nome}')
+
+    producao_nome = Arquivos.PRODUCAO.name.replace('{nome}', nome)
+    producao = Arquivos.PRODUCAO.with_name(producao_nome)
     with open(producao, encoding='utf-8') as document:
         html = document.read()
 

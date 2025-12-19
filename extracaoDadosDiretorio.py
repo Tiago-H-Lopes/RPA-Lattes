@@ -44,5 +44,6 @@ def extrairDadosDiretorio(lattes_id: str) -> None:
 
 
 if __name__ == '__main__':
-    lattes_id=2000279230405792
+    lattes_id=2000279230405792 # SERGIO SAN GREGORIO FAVERO
+    lattes_id=3065759072608048 # ALEXANDRE ANDRADE DOS ANJOS JACOME
     extrairDadosDiretorio(lattes_id)
