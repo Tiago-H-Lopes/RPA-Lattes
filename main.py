@@ -60,34 +60,12 @@ def carregar_nomes(input_csv: str, max_linhas: int | None = None) -> list[str]:
                 break
             if row:
                 nomes.append(row[0].strip())
-        return [n for n in nomes if n]
-
-# if __name__== "__main__":
-#     logger.info('Execução iniciada')
-#     input_csv = INPUT
-    
-#     with open(input_csv) as csv:
-#         row = csv.readline()
-#         # while(row):
-
-#         for _ in range(10):
-#             # try:
-#                 nome = csv.readline().strip()
-#                 if not NomeProcessado(nome):
-#                     logger.info(f'Processando {nome}')
-#                     deletarArquivosTemporarios(nome)
-#                     main(nome)
-                    
-            # except Exception as e:
-            #     logger.error(e)
-            #     continue
-
-            
+        return [n for n in nomes if n]          
 
 if __name__ == "__main__":
     logger.info("Execução iniciada")
     deletarArquivosTemporarios()
-    nomes = carregar_nomes(INPUT, max_linhas=10)
+    nomes = carregar_nomes(INPUT, max_linhas=1000)
     nomes_a_processar = [n for n in nomes if not NomeProcessado(n)]
     logger.info(f"Total a processar: {len(nomes_a_processar)}")
 
