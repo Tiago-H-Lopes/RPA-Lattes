@@ -1,10 +1,9 @@
 import requests
 from bs4 import BeautifulSoup, Tag
-from utils import gerarListaDiretorio, escreverCSV
-from nomes_arquivos import GRUPOS_PESQUISA, GRUPOS_ATUACAO, LINHA_ATUACAO, TITULACAO, PASTA_OUTPUT
-from logs import logger
+from src.pacotes.utils import escrever_csv, logger
+from src.pacotes.utils.nomes_arquivos import GRUPOS_PESQUISA, TITULACAO, PASTA_OUTPUT
 
-def extrairDadosDiretorio(lattes_id: str) -> None:
+def extrair_dados_diretorio(lattes_id: str) -> None:
     url = f'http://dgp.cnpq.br/dgp/espelhorh/{lattes_id}'
     logger.info(f'Usando método Get na url: {url}')
     response = requests.get(url)
@@ -13,7 +12,7 @@ def extrairDadosDiretorio(lattes_id: str) -> None:
         html = response.text
         soup = BeautifulSoup(html, 'html.parser')
 
-        #Coleta as informações de grupo de pesquisa e retorna uma lista
+        # Coleta as informações de grupo de pesquisa e retorna uma lista
         groupos_elements: list[Tag] = soup.find_all('div', class_='control-group')
         lista_grupos_pesquisa = []
         titulacao = ''
@@ -32,17 +31,19 @@ def extrairDadosDiretorio(lattes_id: str) -> None:
             except:
                 pass
         
+        # Se tiver extraido a titulação escreve no output, se tiver extraido a lista de grupos de pesquisa escreve em outro output tambem
         if titulacao:
-            escreverCSV(TITULACAO, lattes_id, texto=titulacao)
+            escrever_csv(TITULACAO, lattes_id, texto=titulacao)
         if lista_grupos_pesquisa:
-            escreverCSV(GRUPOS_PESQUISA, lattes_id, lista_grupos_pesquisa)
+            escrever_csv(GRUPOS_PESQUISA, lattes_id, lista_grupos_pesquisa)
 
+        # Extrai os dados das tabelas
         elements = soup.select('span > div')
         for element in elements:
+            # Extrai os cabeçalhos da tabela
             id = element.get('id')
             if not id : continue
             if id == 'dadosGerais': continue
-
             titulo = element.select_one('legend')
             if not titulo: continue
 
@@ -57,6 +58,7 @@ def extrairDadosDiretorio(lattes_id: str) -> None:
                 if texto:
                     lista_cabecalhos.append(texto)
 
+            # Extrai os valores da tabela
             valores = element.select('td')
             lista_valores = []
             lista_valores_ignorar = ['Nenhum registro adicionado', 'ui-buttonVisualizar']
@@ -73,6 +75,7 @@ def extrairDadosDiretorio(lattes_id: str) -> None:
                 if pular: continue
                 lista_valores.append(texto)
 
+            # Monta o dicionario com o cabecalho e o valor e escreve no documento de output
             contador = 0
             titulo = titulo.replace(' ', '_').upper()
             caminho = PASTA_OUTPUT / f'LATTES_OUTPUT_{titulo}.csv'
@@ -82,50 +85,16 @@ def extrairDadosDiretorio(lattes_id: str) -> None:
                 dicionario = {}
                 dicionario[cabecalho] = valor
                 if valor:
-                    escreverCSV(caminho, lattes_id, dicionario=dicionario)
+                    escrever_csv(caminho, lattes_id, dicionario=dicionario)
                 contador += 1
 
     else:
         logger.error(f'Não foi possivel acessar a url {url}, status code: {response.status_code}')
 
-
-
 if __name__ == '__main__':
     lattes_id=2000279230405792 # SERGIO SAN GREGORIO FAVERO
     lattes_id=3065759072608048 # ALEXANDRE ANDRADE DOS ANJOS JACOME
-    lista = [
-    "2558358124098455",
-    "9208985005837277",
-    "1272058768233040",
-    "3329079748927880",
-    "0475167659981163",
-    "9978224480666395",
-    "2633867419420883",
-    "7717444217239525",
-    "4827680511742964",
-    "7300981629114346",
-    "1929897521905456",
-    "7581141843974703",
-    "6208433886573740",
-    "8637319515539535",
-    "0602933124301833",
-    "2444841881701549",
-    "7170570436557463",
-    "7686691707525007",
-    "2194175558834284",
-    "2069769466957361",
-    "5330490614722659",
-    "6182477842336805",
-    "2618349568972136",
-    "5204063085335824",
-    "3050716643641697",
-    "5624554983752801",
-    "2381161563121871",
-    "5754413873836451",
-    "4636891232412658",
-    "7587451351635053",
-    "3615728985559494"
-]
+    lista = []
 
     for l in lista:
-        extrairDadosDiretorio(l)
+        extrair_dados_diretorio(l)

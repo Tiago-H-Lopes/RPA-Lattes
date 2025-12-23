@@ -1,10 +1,12 @@
 from pathlib import Path
 
 #PASTAS
-PASTA_INPUT = Path('Input')
-PASTA_OUTPUT = Path('Output')
-PASTA_TEMP = Path('Temp')
-PASTA_LOGS = Path('Logs')
+CWD = Path.cwd()
+PASTA_DATA = Path.joinpath(CWD, Path('src'), Path('data'))
+PASTA_INPUT = Path.joinpath(PASTA_DATA, Path('Input'))
+PASTA_OUTPUT = Path.joinpath(PASTA_DATA, Path('Output'))
+PASTA_TEMP = Path.joinpath(PASTA_DATA, Path('Temp'))
+PASTA_LOGS = Path.joinpath(PASTA_DATA, Path('Logs'))
 
 #ARQUIVOS GERAIS
 INPUT = PASTA_INPUT / 'LATTES_INPUT_example.csv'
@@ -45,3 +47,10 @@ TITULACAO = PASTA_OUTPUT / 'LATTES_OUTPUT_TITULACAO.csv'
 GRUPOS_PESQUISA = PASTA_OUTPUT / 'LATTES_OUTPUT_GRUPOS_PESQUISA.csv'
 GRUPOS_ATUACAO = PASTA_OUTPUT / 'LATTES_OUTPUT_GRUPOS_ATUACAO.csv'
 LINHA_ATUACAO = PASTA_OUTPUT / 'LATTES_OUTPUT_LINHA_ATUACAO.csv'
+
+if __name__ == '__main__':
+    print(Path.cwd())
+    print(PASTA_DATA)
+    print(INPUT)
+    print(PASTA_OUTPUT)
+    print(PASTA_LOGS)
