@@ -73,7 +73,7 @@ if __name__ == "__main__":
     logger.info("Execução iniciada")
     subprocess.run(["taskkill", "/F", "/IM", "chrome.exe", "/T"], check=False)
     deletar_arquivos_temporarios()
-    nomes = carregar_nomes(INPUT, max_linhas=50)
+    nomes = carregar_nomes(INPUT)
     nomes_a_processar = [n for n in nomes if not nome_processado(n)]
     logger.info(nomes_a_processar)
     logger.info(f"Total a processar: {len(nomes_a_processar)}")
