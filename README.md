@@ -151,5 +151,5 @@ Período de desenvolvimento: **3–4 semanas**.
 
 ## 📜 Licença
 
-Licença: MIT (ou qualquer outra que deseje adicionar).
+Licença: MIT.
 
